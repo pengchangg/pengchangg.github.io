@@ -1,10 +1,14 @@
 {
-    "title":"Meekdai",
-    "displayTitle":"eekdai",
-    "subTitle":"童话是一种生活态度，仅此而已。",
-    "homeUrl":"https://blog.meekdai.com",
-    "avatarUrl":"https://meekdai.com/avatar.svg",
-    "faviconUrl":"https://meekdai.com/favicon.svg",
+    "title":"Chang",
+    "displayTitle":"pengchang",
+    "singlePage":["link","about"],
+    "subTitle":"仅此而已。",
+    "homeUrl":"https://pengchangg.github.io/",
+    "avatarUrl":"https://avatars.githubusercontent.com/u/55234547?v=4",
+    "faviconUrl":"https://cnd.moxao.cn/2023/11/23/logo-gqjbjgys.jpg",
+    i18n":"CN",
     "singlePage":[],
+    "bottomText":"❤️ 转载文章请注明出处，谢谢！❤️",
+    "yearColorList":["#bc4c00", "#0969da", "#1f883d", "#A333D0"],
     "GMEEK_VERSION":"last"
 }
