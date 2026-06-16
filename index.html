@@ -2,762 +2,400 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dotfiles — terminal environment</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%230d7377'/><text x='16' y='24' text-anchor='middle' font-size='22' font-family='monospace' fill='white' font-weight='bold'>❯</text></svg>">
+<title>Home Manager 配置一览</title>
+<meta name="author" content="pengchang">
+<meta name="description" content="声明式管理 Arch Linux 开发环境：33 个包、8 个程序模块，bash/zsh 双 Shell，Nix + home-manager 全环境配置。">
+<meta name="keywords" content="Nix, home-manager, Arch Linux, dotfiles, 配置管理, bash, zsh">
+<meta name="generator" content="Kami">
 <style>
-/* ═══════════════════════════════════════════════════════
-   Terminal-native design
-   ═══════════════════════════════════════════════════════ */
-:root {
-  --bg:        #fafaf8;
-  --bg-panel:  #f0f0ec;
-  --bg-hover:  #e8e8e2;
-  --bg-cell:    rgba(0,0,0,0.04);
-
-  --fg:        #1a1a1a;
-  --fg-dim:    #5c5c5c;
-  --fg-faint:  #a0a0a0;
-
-  --accent:    #0d7377;
-  --accent-dim:#095558;
-  --red:       #c7254e;
-  --yellow:    #8b6c00;
-  --blue:      #2563eb;
-  --purple:    #7c3aed;
-  --cyan:      #0d7377;
-  --orange:    #c2410c;
-  --pink:      #be185d;
-
-  --border:    #e0e0da;
-  --border-dim:#ecece6;
-
-  --font: "JetBrains Mono", "Cascadia Code", "SF Mono", "Fira Code", "Fira Mono", "Noto Sans Mono", monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
-
-  --radius: 4px;
-  --sidebar-w: 250px;
-  --content-w: 820px;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 24px;
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  font-family: var(--font);
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: var(--fg);
-  background: var(--bg);
-  display: flex;
-  min-height: 100vh;
-}
-
-/* ═══════════════════════════════════════════════════════
-   Sidebar — terminal pane
-   ═══════════════════════════════════════════════════════ */
-.sidebar {
-  position: sticky; top: 0;
-  width: var(--sidebar-w); height: 100vh;
-  flex-shrink: 0;
-  background: var(--bg-panel);
-  border-right: 1px solid var(--border);
-  padding: 28px 20px;
-  overflow-y: auto;
-  display: flex; flex-direction: column;
-}
-
-.sidebar-brand {
-  font-size: 15px; font-weight: 600; color: var(--accent);
-  margin-bottom: 28px; letter-spacing: -0.01em;
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--font);
-}
-.sidebar-brand::before {
-  content: "❯"; color: var(--accent); font-size: 14px;
-}
-
-.sidebar-group { margin-bottom: 18px; }
-.sidebar-group-title {
-  font-size: 10px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.08em; color: var(--fg-faint); margin-bottom: 6px;
-}
-.sidebar-item {
-  display: block; font-size: 12.5px; color: var(--fg-dim);
-  padding: 3px 0; transition: color 0.12s; text-decoration: none;
-}
-.sidebar-item:hover { color: var(--fg); text-decoration: none; }
-.sidebar-item.active { color: var(--accent); }
-
-.sidebar-footer {
-  margin-top: auto; font-size: 11px; color: var(--fg-faint);
-  padding-top: 14px; border-top: 1px solid var(--border-dim);
-  font-family: var(--font-sans);
-}
-
-/* ═══════════════════════════════════════════════════════
-   Main content
-   ═══════════════════════════════════════════════════════ */
-.main {
-  flex: 1; max-width: var(--content-w);
-  padding: 40px 52px 96px; min-width: 0;
-}
-
-.section { margin-bottom: 48px; }
-.section:last-of-type { margin-bottom: 0; }
-.section-target { scroll-margin-top: 24px; }
-
-/* ═══════════════════════════════════════════════════════
-   Typography
-   ═══════════════════════════════════════════════════════ */
-h1 {
-  font-size: 22px; font-weight: 600; color: var(--fg);
-  margin-bottom: 4px; letter-spacing: -0.01em;
-}
-h1::before { content: "# "; color: var(--fg-faint); }
-
-h2 {
-  font-size: 15px; font-weight: 600; color: var(--accent);
-  margin-bottom: 14px; padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-dim);
-}
-h2::before { content: "## "; color: var(--fg-faint); }
-
-h3 {
-  font-size: 13.5px; font-weight: 600; color: var(--fg);
-  margin-bottom: 6px; margin-top: 22px;
-}
-h3:first-child { margin-top: 0; }
-
-p { margin-bottom: 10px; color: var(--fg-dim); line-height: 1.65; }
-p.lead {
-  font-size: 14px; color: var(--fg); margin-bottom: 0;
-  font-family: var(--font-sans);
-}
-
-a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
-
-code {
-  font-family: var(--font); font-size: 0.9em;
-  color: var(--accent); background: var(--bg-cell);
-  padding: 1px 5px; border-radius: 3px;
-}
-
-pre code {
-  background: none; color: inherit; padding: 0; border-radius: 0;
-  font-size: 12.5px; line-height: 1.55;
-}
-
-/* ═══════════════════════════════════════════════════════
-   Metrics — as terminal command output
-   ═══════════════════════════════════════════════════════ */
-.metrics {
-  display: flex; gap: 36px;
-  margin: 28px 0 34px;
-  padding: 16px 0;
-  border-top: 1px solid var(--border-dim);
-  border-bottom: 1px solid var(--border-dim);
-}
-.metric { display: flex; align-items: baseline; gap: 6px; }
-.metric-value {
-  font-size: 22px; font-weight: 600; color: var(--accent);
-  font-variant-numeric: tabular-nums; line-height: 1;
-}
-.metric-label { font-size: 12px; color: var(--fg-faint); font-family: var(--font-sans); }
-
-/* ═══════════════════════════════════════════════════════
-   Code blocks — same surface, just framed
-   ═══════════════════════════════════════════════════════ */
-.code-block {
-  margin: 14px 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.code-block-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 14px;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border-dim);
-}
-.code-block-label { font-size: 11px; color: var(--fg-faint); }
-.code-block-copy {
-  font-family: var(--font-sans); font-size: 10.5px;
-  color: var(--fg-dim); background: var(--bg-cell);
-  border: 1px solid var(--border-dim); padding: 2px 8px;
-  border-radius: 3px; cursor: pointer; transition: all 0.12s;
-  touch-action: manipulation;
-}
-.code-block-copy:hover { color: var(--fg); border-color: var(--border); }
-.code-block-copy.copied { color: var(--accent); border-color: var(--accent); }
-
-.code-block pre {
-  padding: 14px; margin: 0; overflow-x: auto;
-  color: var(--fg); font-size: 12.5px; line-height: 1.55;
-  tab-size: 2; background: var(--bg);
-}
-
-/* Syntax — terminal color palette */
-.syn-c { color: var(--fg-faint); }
-.syn-k { color: var(--purple); }
-.syn-s { color: var(--cyan); }
-.syn-v { color: var(--blue); }
-.syn-f { color: var(--pink); }
-.syn-o { color: var(--red); }
-.syn-n { color: var(--orange); }
-.syn-b { color: var(--yellow); }
-.syn-h { color: var(--accent); }
-.syn-d { color: var(--cyan); }
-
-/* ═══════════════════════════════════════════════════════
-   Tables — minimal terminal style
-   ═══════════════════════════════════════════════════════ */
-table {
-  width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0;
-}
-
-thead th {
-  text-align: left; font-size: 10.5px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.05em;
-  color: var(--fg-faint); padding: 0 10px 6px;
-  border-bottom: 1px solid var(--border);
-  font-family: var(--font-sans);
-}
-
-tbody td {
-  padding: 6px 10px; border-bottom: 1px solid var(--border-dim);
-  vertical-align: top;
-}
-tbody tr:last-child td { border-bottom: none; }
-tbody td:first-child code { font-size: 0.85em; }
-
-/* ═══════════════════════════════════════════════════════
-   Callout
-   ═══════════════════════════════════════════════════════ */
-.callout {
-  background: var(--bg-cell);
-  border-left: 3px solid var(--accent);
-  padding: 12px 16px; margin: 20px 0;
-  font-size: 13px; color: var(--fg-dim); line-height: 1.6;
-}
-.callout strong { color: var(--accent); }
-
-/* ═══════════════════════════════════════════════════════
-   Responsive
-   ═══════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  body { flex-direction: column; }
-  .sidebar {
-    position: relative; width: 100%; height: auto;
-    border-right: none; border-bottom: 1px solid var(--border);
-    padding: 18px 20px;
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
   }
-  .sidebar-group { margin-bottom: 10px; }
-  .sidebar-footer { display: none; }
-  .main { padding: 28px 20px 56px; }
-  h1 { font-size: 18px; }
-  .metrics { gap: 18px; flex-wrap: wrap; }
-}
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --sand:      #e8e6dc;
+    --near-black:#141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --border:    #e8e6dc;
+    --border-soft:#e5e3d8;
+    --tag-bg:    #E4ECF5;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
+    --sans: var(--serif);
+  }
+
+  html, body { background: var(--parchment); }
+
+  body {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 56px;
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 13px;
+    line-height: 1.55;
+    letter-spacing: 0.3pt;
+  }
+
+  @media (max-width: 800px) {
+    body { padding: 32px 28px; }
+  }
+
+  .header {
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
+    margin-bottom: 18pt;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20pt;
+  }
+  .title-block { flex: 1; }
+  .eyebrow {
+    font-size: 12px;
+    color: var(--brand);
+    letter-spacing: 1.5pt;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--olive);
+    line-height: 1.45;
+  }
+  .meta {
+    font-size: 12px;
+    color: var(--stone);
+    text-align: right;
+    line-height: 1.55;
+    white-space: nowrap;
+  }
+
+  .metrics {
+    display: flex;
+    gap: 18pt;
+    margin-bottom: 22pt;
+    padding: 6pt 0 8pt 0;
+    border-bottom: 0.3pt dotted var(--border);
+  }
+  .metric {
+    flex: 1;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6pt;
+    break-inside: avoid;
+  }
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--brand);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .metric-label {
+    font-size: 12px;
+    color: var(--olive);
+    line-height: 1.4;
+  }
+
+  section { margin-bottom: 22pt; break-inside: avoid; }
+  section:last-of-type { margin-bottom: 0; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--near-black);
+    margin-bottom: 8pt;
+  }
+  h2 .sub {
+    font-size: 12px;
+    color: var(--stone);
+    font-weight: 400;
+    margin-left: 6pt;
+  }
+
+  p { margin-bottom: 7pt; line-height: 1.55; }
+  p:last-child { margin-bottom: 0; }
+
+  .lead {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--dark-warm);
+    margin-bottom: 18pt;
+  }
+
+  .hl { color: var(--brand); font-weight: 500; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24pt;
+  }
+
+  ul.dash {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul.dash li {
+    position: relative;
+    padding-left: 14pt;
+    margin-bottom: 5pt;
+    line-height: 1.5;
+  }
+  ul.dash li::before {
+    content: "\2013";
+    position: absolute;
+    left: 0;
+    color: var(--brand);
+  }
+
+  .timeline {
+    display: flex;
+    gap: 16pt;
+    margin-top: 8pt;
+  }
+  .tl-step {
+    flex: 1;
+    break-inside: avoid;
+  }
+  .tl-year {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brand);
+    margin-bottom: 3pt;
+  }
+  .tl-head {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--near-black);
+    margin-bottom: 3pt;
+  }
+  .tl-body {
+    font-size: 12px;
+    color: var(--olive);
+    line-height: 1.45;
+  }
+
+  table, .kami-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 10pt 0;
+    break-inside: avoid;
+  }
+  table th, .kami-table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dark-warm);
+    padding: 6pt 8pt;
+    border-bottom: 1pt solid var(--border);
+    background: transparent;
+  }
+  table td, .kami-table td {
+    padding: 5pt 8pt;
+    border-bottom: 0.3pt solid var(--border-soft);
+    vertical-align: top;
+  }
+  table.striped tbody tr:nth-child(even) td {
+    background: var(--ivory);
+  }
+
+  .callout {
+    background: transparent;
+    border-left: 1.8pt solid var(--brand);
+    padding: 5pt 0 5pt 14pt;
+    margin: 14pt 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--olive);
+    break-inside: avoid;
+  }
+
+  code {
+    font-family: "JetBrains Mono", "SF Mono", "Fira Code", Consolas, Monaco, monospace;
+    font-size: 12px;
+    background: var(--ivory);
+    padding: 1pt 4pt;
+    border-radius: 3pt;
+    color: var(--dark-warm);
+  }
+
+  .footer {
+    margin-top: 22pt;
+    padding-top: 8pt;
+    border-top: 0.3pt dotted var(--border);
+    font-size: 11px;
+    color: var(--stone);
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.3pt;
+  }
 </style>
 </head>
 <body>
 
-<nav class="sidebar">
-  <div class="sidebar-brand">dotfiles</div>
-
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">概览</div>
-    <a href="#overview" class="sidebar-item active">架构</a>
+<div class="header">
+  <div class="title-block">
+    <div class="eyebrow">Nix · 配置管理</div>
+    <h1>Home Manager 配置一览</h1>
+    <div class="subtitle">声明式管理 Arch Linux 开发环境——33 个包，8 个程序模块，bash / zsh 双 Shell，一次 <code>home-manager switch</code> 即达声明状态。</div>
   </div>
-
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">Bash</div>
-    <a href="#bash-architecture" class="sidebar-item">路由架构</a>
-    <a href="#bash-prompt" class="sidebar-item">Prompt 与选项</a>
-    <a href="#bash-fzf" class="sidebar-item">Fzf 快捷键</a>
-    <a href="#bash-aliases" class="sidebar-item">工具替换与别名</a>
+  <div class="meta">
+    pengchang<br>
+    2026.06.16<br>
+    v1
   </div>
+</div>
 
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">lf</div>
-    <a href="#lf-overview" class="sidebar-item">概览与布局</a>
-    <a href="#lf-preview" class="sidebar-item">预览系统</a>
-    <a href="#lf-keybinds" class="sidebar-item">快捷键</a>
-    <a href="#lf-cmds" class="sidebar-item">命令与集成</a>
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">33</div>
+    <div class="metric-label">Nix 包</div>
   </div>
-
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">tmux</div>
-    <a href="#tmux-basics" class="sidebar-item">基础设置</a>
-    <a href="#tmux-ui" class="sidebar-item">界面与状态栏</a>
-    <a href="#tmux-keybinds" class="sidebar-item">快捷键</a>
-    <a href="#tmux-plugins" class="sidebar-item">插件</a>
+  <div class="metric">
+    <div class="metric-value">8</div>
+    <div class="metric-label">程序模块</div>
   </div>
-
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">SSH</div>
-    <a href="#ssh-overview" class="sidebar-item">概览与加密</a>
-    <a href="#ssh-config" class="sidebar-item">Config 与密钥</a>
+  <div class="metric">
+    <div class="metric-value">bash+zsh</div>
+    <div class="metric-label">双 Shell</div>
   </div>
-
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">Git</div>
-    <a href="#git-config" class="sidebar-item">全局配置与签名</a>
+  <div class="metric">
+    <div class="metric-value">GPG</div>
+    <div class="metric-label">签名提交</div>
   </div>
+</div>
 
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">GnuPG</div>
-    <a href="#gnupg-config" class="sidebar-item">Pinentry 配置</a>
+<p class="lead">
+  从 <span class="hl">stow + git</span> 手工符号链接，迁移到 <span class="hl">Nix + home-manager</span> 声明式全环境管理。覆盖 Shell、编辑器、Git、Tmux、文件管理器等全部日常工具，CI 自动构建验证，变更可回滚。
+</p>
+
+<div class="two-col">
+  <section>
+    <h2>包管理</h2>
+    <p>33 个包通过 <code>home.packages</code> 声明，来自 <span class="hl">nixpkgs-unstable</span> channel。</p>
+    <ul class="dash">
+      <li>Shell 工具：<span class="hl">bat, fd, fzf, ripgrep, lf, tmux, zsh</span> 等 11 个</li>
+      <li>编辑器：<span class="hl">neovim, nano</span></li>
+      <li>版本控制：<span class="hl">git, git-crypt, stow</span></li>
+      <li>构建工具：<span class="hl">gcc, gnumake, tree-sitter</span></li>
+      <li>网络实用：<span class="hl">podman, curl, ffmpeg, openssh</span> 等 8 个</li>
+      <li>Python：<span class="hl">python3, weasyprint</span>（Kami 排版）</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>程序模块</h2>
+    <p>8 个 home-manager 原生模块，配置声明即生效。</p>
+    <ul class="dash">
+      <li><span class="hl">starship</span>：极简 prompt，目录 + git 分支</li>
+      <li><span class="hl">bash / zsh</span>：initExtra 外置脚本，fzf 快捷键</li>
+      <li><span class="hl">git</span>：GPG 签名 + gh 凭证助手</li>
+      <li><span class="hl">tmux</span>：vi 模式、256 色、鼠标支持</li>
+      <li><span class="hl">fzf</span>：Ctrl+R 历史 / Ctrl+T 文件 / Alt+C 目录</li>
+      <li><span class="hl">lf</span>：三栏布局 + pv.sh 预览脚本</li>
+    </ul>
+  </section>
+</div>
+
+<section>
+  <h2>配置模块一览</h2>
+  <table class="kami-table striped">
+    <thead>
+      <tr><th>模块</th><th>方式</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>bash</td><td>programs.bash</td><td>initExtra.bash 外置；history 5000 条</td></tr>
+      <tr><td>zsh</td><td>programs.zsh</td><td>initExtra.zsh 外置；SHARE_HISTORY</td></tr>
+      <tr><td>git</td><td>programs.git</td><td>GPG 签名 + gh 凭证；默认分支 main</td></tr>
+      <tr><td>tmux</td><td>programs.tmux</td><td>vi 键位、256 色、base-index 1</td></tr>
+      <tr><td>starship</td><td>programs.starship</td><td>目录 + git 分支 + 状态 + ❯ 提示符</td></tr>
+      <tr><td>fzf</td><td>programs.fzf</td><td>40% 高度、reverse 布局、文件预览</td></tr>
+      <tr><td>lf</td><td>programs.lf</td><td>三栏 1:2:3、vim 键位、pv.sh 预览</td></tr>
+      <tr><td>gnupg</td><td>home.file</td><td>loopback pinentry，配合 GPG 签名</td></tr>
+      <tr><td>neovim</td><td>home.file</td><td>递归复制整个 nvim 配置目录</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>迁移路径</h2>
+  <div class="timeline">
+    <div class="tl-step">
+      <div class="tl-year">阶段 1</div>
+      <div class="tl-head">stow 管理</div>
+      <div class="tl-body">GNU stow + git 手工维护符号链接，git-crypt 加密敏感文件</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-year">阶段 2</div>
+      <div class="tl-head">引入 Nix</div>
+      <div class="tl-body">Nix 包管理器接管系统包安装，统一版本管理</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-year">阶段 3</div>
+      <div class="tl-head">home-manager</div>
+      <div class="tl-body">声明式全环境：包 + 配置 + 服务，一次 switch 到位，CI 自动验证</div>
+    </div>
   </div>
+</section>
 
-  <div class="sidebar-group">
-    <div class="sidebar-group-title">Neovim</div>
-    <a href="#nvim-config" class="sidebar-item">配置与插件</a>
-  </div>
+<section>
+  <h2>日常命令</h2>
+  <table class="kami-table striped">
+    <thead>
+      <tr><th>命令</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>home-manager switch</code></td><td>应用配置变更</td></tr>
+      <tr><td><code>home-manager build</code></td><td>仅构建，测试语法</td></tr>
+      <tr><td><code>home-manager generations</code></td><td>查看历史版本</td></tr>
+      <tr><td><code>nix-shell -p &lt;pkg&gt;</code></td><td>临时试用包，无需安装</td></tr>
+      <tr><td><code>nix-collect-garbage -d</code></td><td>清理旧版本，回收空间</td></tr>
+      <tr><td><code>home-manager expire-generations 7d</code></td><td>只保留最近 7 天的版本</td></tr>
+    </tbody>
+  </table>
+</section>
 
-  <div class="sidebar-footer">Arch Linux · root · v3.0</div>
-</nav>
+<div class="callout">
+  <strong>注意事项</strong>：<code>shellOptions</code> 只接受 <code>shopt</code> 参数，<code>set -o</code> 项（如 noclobber）放 <code>initExtra</code>；Nix 字符串不支持 <code>${}</code>，含 bash 变量的内容用 <code>builtins.readFile</code> 外置文件；Channel 锁定 <span class="hl">nixpkgs-unstable + home-manager master</span>；CI 通过 GitHub Actions 自动 <code>home-manager build</code> + <code>nixpkgs-fmt</code> 检查。
+</div>
 
-<main class="main">
+<div class="footer">
+  <span>公开 · pengchangg/home-manager-config</span>
+  <span>github.com/pengchangg/home-manager-config</span>
+</div>
 
-  <section class="section section-target" id="overview">
-    <h1>dotfiles</h1>
-    <p class="lead">Arch Linux 终端环境配置，GNU stow + git 管理，GPG 签名。私密文件 git-crypt 加密。</p>
-
-    <div class="metrics">
-      <div class="metric"><span class="metric-value">7</span><span class="metric-label">工具</span></div>
-      <div class="metric"><span class="metric-value">8</span><span class="metric-label">模块</span></div>
-      <div class="metric"><span class="metric-value">35</span><span class="metric-label">系统包</span></div>
-      <div class="metric"><span class="metric-value">30+</span><span class="metric-label">nvim 插件</span></div>
-    </div>
-
-    <h3>目录结构</h3>
-    <div class="code-block">
-      <div class="code-block-header">
-        <span class="code-block-label">~/.dotfiles/</span>
-        <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><span class="syn-v">~/.dotfiles/</span>
-<span class="syn-c">├── README.md              # 仓库说明</span>
-<span class="syn-c">├── bootstrap.sh           # 一键还原脚本</span>
-<span class="syn-c">├── packages.txt           # 系统包清单</span>
-<span class="syn-v">├── git/</span>
-<span class="syn-c">│   ├── README.md          # git 模块文档</span>
-<span class="syn-v">│   └── .gitconfig         # → ~/.gitconfig</span>
-<span class="syn-v">├── gnupg/</span>
-<span class="syn-c">│   ├── README.md          # gnupg 模块文档</span>
-<span class="syn-v">│   └── .gnupg/            # → ~/.gnupg/</span>
-<span class="syn-c">│       ├── gpg.conf       #   pinentry 配置</span>
-<span class="syn-c">│       └── gpg-agent.conf #   agent 配置</span>
-<span class="syn-v">├── bash/</span>
-<span class="syn-c">│   ├── README.md          # bash 模块文档</span>
-<span class="syn-v">│   ├── .bashrc            # → ~/.bashrc</span>
-<span class="syn-v">│   ├── .bash_profile      # → ~/.bash_profile</span>
-<span class="syn-v">│   ├── .profile           # → ~/.profile</span>
-<span class="syn-v">│   └── .config/</span>
-<span class="syn-v">│       ├── bash/          # → ~/.config/bash/</span>
-<span class="syn-c">│       │   ├── bashrc     #   主配置</span>
-<span class="syn-c">│       │   ├── fzf.sh     #   fzf 快捷键</span>
-<span class="syn-c">│       │   └── profile    #   login shell</span>
-<span class="syn-v">│       └── starship.toml  # → ~/.config/starship.toml</span>
-<span class="syn-v">├── lf/</span>
-<span class="syn-c">│   ├── README.md          # lf 模块文档</span>
-<span class="syn-v">│   └── .config/lf/        # → ~/.config/lf/</span>
-<span class="syn-c">│       ├── lfrc           #   主配置</span>
-<span class="syn-c">│       └── pv.sh          #   预览脚本</span>
-<span class="syn-v">├── tmux/</span>
-<span class="syn-c">│   ├── README.md          # tmux 模块文档</span>
-<span class="syn-v">│   └── .tmux.conf         # → ~/.tmux.conf</span>
-<span class="syn-v">├── nvim/</span>
-<span class="syn-c">│   ├── README.md          # nvim 模块文档</span>
-<span class="syn-v">│   └── .config/nvim/      # → ~/.config/nvim/</span>
-<span class="syn-c">│       ├── init.lua       #   入口</span>
-<span class="syn-c">│       └── lua/           #   config/ + plugins/</span>
-<span class="syn-v">└── ssh/                   # 🔒 git-crypt</span>
-<span class="syn-c">    ├── README.md          # ssh 模块文档</span>
-<span class="syn-v">    └── .ssh/              # → ~/.ssh/</span>
-<span class="syn-c">        ├── config         #   🔒 客户端配置</span>
-<span class="syn-c">        ├── id_ed25519     #   🔒 主密钥</span>
-<span class="syn-c">        ├── *.pub          #   📄 公钥</span>
-<span class="syn-c">        ├── dev/prod/...   #   🔒 环境密钥</span>
-<span class="syn-c">        ├── *.pem          #   🔒 PEM 密钥</span>
-<span class="syn-c">        └── known_hosts    #   📄 主机指纹</span></pre>
-    </div>
-
-    <p>部署：<code>cd ~/.dotfiles && stow git gnupg bash lf tmux nvim ssh</code> 或 <code>./bootstrap.sh</code> 一键还原。新增工具：<code>mkdir -p pkg/.config/tool && stow pkg</code>。</p>
-  </section>
-
-  <!-- ═══════════════ Bash ═══════════════ -->
-
-  <section class="section section-target" id="bash-architecture">
-    <h2>Bash · 路由架构</h2>
-    <p>所有配置收敛于 <code>~/.config/bash/</code>，~ 目录仅保留两个路由桩文件。模块间通过 source 解耦，修改任一模块后 <code>reload</code> 即可生效。</p>
-
-    <table>
-      <thead><tr><th>文件</th><th>位置</th><th>职责</th></tr></thead>
-      <tbody>
-        <tr><td><code>~/.bash_profile</code></td><td>~</td><td>路由至 <code>~/.config/bash/profile</code></td></tr>
-        <tr><td><code>~/.bashrc</code></td><td>~</td><td>路由至 <code>~/.config/bash/bashrc</code></td></tr>
-        <tr><td><code>~/.profile</code></td><td>~</td><td>仅负责 PATH 注入</td></tr>
-        <tr><td><code>bashrc</code></td><td>~/.config/bash/</td><td>主配置：环境变量、别名、选项、加载 fzf</td></tr>
-        <tr><td><code>fzf.sh</code></td><td>~/.config/bash/</td><td>fzf 快捷键独立模块</td></tr>
-        <tr><td><code>profile</code></td><td>~/.config/bash/</td><td>login shell 入口</td></tr>
-      </tbody>
-    </table>
-
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-block-label">~/.dotfiles/bash/.bash_profile</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="syn-c"># ~/.bash_profile — routes to ~/.config/bash/profile</span>
-<span class="syn-b">[[</span> <span class="syn-o">-f</span> <span class="syn-v">~/.config/bash/profile</span> <span class="syn-b">]]</span> <span class="syn-o">&&</span> <span class="syn-b">.</span> <span class="syn-v">~/.config/bash/profile</span></pre>
-    </div>
-  </section>
-
-  <section class="section section-target" id="bash-prompt">
-    <h2>Bash · Prompt 与 Shell 选项</h2>
-    <h3>Starship Prompt</h3>
-    <p>配置 <code>~/.config/starship.toml</code>，目录 + Git 分支 + 仓库状态 + ❯。退出码异常时 ❯ 变红。</p>
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-block-label">~/.dotfiles/bash/.config/starship.toml</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="syn-v">format</span> = <span class="syn-s">'</span><span class="syn-v">$directory$git_branch$git_status$character</span><span class="syn-s">'</span>
-
-<span class="syn-b">[</span><span class="syn-v">directory</span><span class="syn-b">]</span>
-<span class="syn-v">truncation_length</span> = <span class="syn-n">3</span>
-
-<span class="syn-b">[</span><span class="syn-v">git_branch</span><span class="syn-b">]</span>
-<span class="syn-v">format</span> = <span class="syn-s">'[</span><span class="syn-v">$branch</span><span class="syn-s">](</span><span class="syn-v">$style</span><span class="syn-s">) '</span>
-
-<span class="syn-b">[</span><span class="syn-v">git_status</span><span class="syn-b">]</span>
-<span class="syn-v">style</span> = <span class="syn-s">'yellow'</span>
-<span class="syn-v">modified</span> = <span class="syn-s">'!'</span>
-<span class="syn-v">staged</span> = <span class="syn-s">'+'</span>
-<span class="syn-v">untracked</span> = <span class="syn-s">'?'</span>
-
-<span class="syn-b">[</span><span class="syn-v">character</span><span class="syn-b">]</span>
-<span class="syn-v">success_symbol</span> = <span class="syn-s">'[❯](bold green)'</span>
-<span class="syn-v">error_symbol</span> = <span class="syn-s">'[❯](bold red)'</span></pre>
-    </div>
-
-    <h3>Shell 选项</h3>
-    <table>
-      <thead><tr><th>选项</th><th>作用</th></tr></thead>
-      <tbody>
-        <tr><td><code>noclobber</code></td><td><code>&gt;</code> 不覆盖已有文件</td></tr>
-        <tr><td><code>histappend</code></td><td>多会话共享历史，<code>HISTSIZE=5000</code></td></tr>
-        <tr><td><code>completion-ignore-case</code></td><td>Tab 补全忽略大小写</td></tr>
-        <tr><td><code>bash-completion</code></td><td>系统级智能补全</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="bash-fzf">
-    <h2>Bash · Fzf 快捷键</h2>
-    <p>所有绑定使用 <code>bind -m emacs-standard -x</code>，显式指定 keymap 避免冲突。Alt+C 采用 macro 方式规避 <code>bind -x</code> 的交互 bug。</p>
-    <table>
-      <thead><tr><th>快捷键</th><th>功能</th><th>实现</th></tr></thead>
-      <tbody>
-        <tr><td><code>Ctrl+R</code></td><td>搜索历史，插入命令行可编辑</td><td><code>bind -x __fzf_history</code></td></tr>
-        <tr><td><code>Ctrl+T</code></td><td>选择文件插入路径</td><td><code>bind -x fzf-file-widget</code></td></tr>
-        <tr><td><code>Ctrl+O</code></td><td>fzf 选文件，nvim 打开</td><td><code>bind -x fzf-nvim-widget</code></td></tr>
-        <tr><td><code>Alt+C</code></td><td>选择目录并 cd</td><td><code>bind</code> macro（非 -x）</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="bash-aliases">
-    <h2>Bash · 工具替换与别名</h2>
-    <h3>工具替换</h3>
-    <table>
-      <thead><tr><th>原命令</th><th>替换为</th><th>优势</th></tr></thead>
-      <tbody>
-        <tr><td><code>grep</code></td><td><code>rg</code></td><td>ripgrep：毫秒级全文搜索</td></tr>
-        <tr><td><code>find</code></td><td><code>fd</code></td><td>fd：速度比 find 快 5-8 倍</td></tr>
-        <tr><td><code>cat</code></td><td><code>bat -p</code></td><td>bat：语法高亮 + 行号</td></tr>
-      </tbody>
-    </table>
-    <h3>常用别名</h3>
-    <table>
-      <thead><tr><th>别名</th><th>展开</th><th>用途</th></tr></thead>
-      <tbody>
-        <tr><td><code>g / gs / gl / gd</code></td><td><code>git / status / log / diff</code></td><td>Git 速查</td></tr>
-        <tr><td><code>ll / l</code></td><td><code>ls -alFh / ls -CF</code></td><td>列表</td></tr>
-        <tr><td><code>.. / ...</code></td><td><code>cd .. / cd ../..</code></td><td>导航</td></tr>
-        <tr><td><code>reload</code></td><td><code>source ~/.config/bash/bashrc</code></td><td>重载</td></tr>
-        <tr><td><code>mcd</code></td><td><code>mkdir -p &amp;&amp; cd</code></td><td>创建并进入</td></tr>
-        <tr><td><code>cp / mv / rm</code></td><td><code>-i</code></td><td>覆盖确认</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ═══════════════ lf ═══════════════ -->
-
-  <section class="section section-target" id="lf-overview">
-    <h2>lf · 概览与布局</h2>
-    <p>Go 写的终端文件管理器，配置位于 <code>~/.config/lf/</code>。通过 <code>lfcd()</code> 函数集成到 shell，退出时自动 cd 到所选目录。</p>
-    <table>
-      <thead><tr><th>栏位</th><th>比例</th><th>内容</th></tr></thead>
-      <tbody>
-        <tr><td>目录树</td><td>1</td><td>文件系统浏览</td></tr>
-        <tr><td>文件列表</td><td>2</td><td>当前目录文件</td></tr>
-        <tr><td>预览窗格</td><td>3</td><td>md → glow / 文本 → bat / 二进制 → 元信息</td></tr>
-      </tbody>
-    </table>
-    <table>
-      <thead><tr><th>设置</th><th>值</th><th>原因</th></tr></thead>
-      <tbody>
-        <tr><td><code>icons</code></td><td>false</td><td>无 NERD Fonts，SSH 兼容</td></tr>
-        <tr><td><code>drawbox</code></td><td>true</td><td>框线分隔面板</td></tr>
-        <tr><td><code>number</code></td><td>true</td><td>行号定位</td></tr>
-        <tr><td><code>sortby</code></td><td>natural</td><td>自然排序</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="lf-preview">
-    <h2>lf · 预览系统</h2>
-    <p>预览脚本 <code>pv.sh</code> 按 MIME 类型分派预览器，文本优先。</p>
-    <table>
-      <thead><tr><th>文件类型</th><th>预览器</th></tr></thead>
-      <tbody>
-        <tr><td>目录</td><td><code>ls -lh</code></td></tr>
-        <tr><td>Markdown</td><td><code>glow -s dark</code></td></tr>
-        <tr><td>文本 / JSON / XML</td><td><code>bat</code></td></tr>
-        <tr><td>二进制</td><td>跳过（显示 MIME + 大小）</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="lf-keybinds">
-    <h2>lf · 快捷键</h2>
-    <table>
-      <thead><tr><th>键</th><th>功能</th><th>键</th><th>功能</th></tr></thead>
-      <tbody>
-        <tr><td><code>j / k</code></td><td>上下</td><td><code>gg / G</code></td><td>顶/底</td></tr>
-        <tr><td><code>h / l</code></td><td>上级/打开</td><td><code>.</code></td><td>上级目录</td></tr>
-        <tr><td><code>v</code></td><td>反选</td><td><code>y / d / p</code></td><td>复制/剪切/粘贴</td></tr>
-        <tr><td><code>zh</code></td><td>toggle 隐藏</td><td><code>/</code></td><td>搜索</td></tr>
-        <tr><td><code>Enter</code></td><td>系统打开</td><td><code>O / e</code></td><td>nvim 打开</td></tr>
-        <tr><td><code>Ctrl+N</code></td><td>创建目录</td><td><code>Ctrl+F</code></td><td>创建文件</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="lf-cmds">
-    <h2>lf · 命令与 Bash 集成</h2>
-    <h3>Bash 集成</h3>
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-block-label">~/.dotfiles/bash/.config/bash/bashrc (lf section)</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="syn-f">lfcd</span>() {
-    <span class="syn-k">local</span> <span class="syn-v">dir</span>
-    <span class="syn-v">dir</span>=<span class="syn-b">$(</span><span class="syn-b">command</span> lf <span class="syn-o">-print-last-dir</span> <span class="syn-s">"$@"</span> <span class="syn-n">2</span><span class="syn-o">></span>/dev/null<span class="syn-b">)</span> <span class="syn-o">&&</span> <span class="syn-b">cd</span> <span class="syn-s">"$dir"</span>
-}
-<span class="syn-b">alias</span> <span class="syn-v">l</span>=<span class="syn-s">'lfcd'</span></pre>
-    </div>
-    <h3>依赖</h3>
-    <table>
-      <thead><tr><th>工具</th><th>安装</th></tr></thead>
-      <tbody>
-        <tr><td><code>lf</code></td><td><code>pacman -S lf</code></td></tr>
-        <tr><td><code>bat</code></td><td><code>pacman -S bat</code></td></tr>
-        <tr><td><code>glow</code></td><td><code>pacman -S glow</code></td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ═══════════════ tmux ═══════════════ -->
-
-  <section class="section section-target" id="tmux-basics">
-    <h2>tmux · 基础设置</h2>
-    <p>tmux 配置位于 <code>~/.tmux.conf</code>，前缀键保持默认 <code>Ctrl+B</code>。</p>
-    <table>
-      <thead><tr><th>设置</th><th>值</th><th>作用</th></tr></thead>
-      <tbody>
-        <tr><td><code>default-terminal</code></td><td><code>tmux-256color</code></td><td>256 色</td></tr>
-        <tr><td><code>base-index</code></td><td><code>1</code></td><td>窗口 &amp; pane 从 1 开始</td></tr>
-        <tr><td><code>escape-time</code></td><td><code>10</code></td><td>降低 Esc 延迟</td></tr>
-        <tr><td><code>history-limit</code></td><td><code>10000</code></td><td>回滚缓冲区</td></tr>
-        <tr><td><code>renumber-windows</code></td><td><code>on</code></td><td>关闭后自动重排</td></tr>
-        <tr><td><code>xterm-keys</code></td><td><code>on</code></td><td>扩展键盘协议</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="tmux-ui">
-    <h2>tmux · 界面与状态栏</h2>
-    <p>Pane 边框暗灰 / 亮蓝区分，状态栏黑底白字，左 session 名右日期时间。</p>
-  </section>
-
-  <section class="section section-target" id="tmux-keybinds">
-    <h2>tmux · 快捷键</h2>
-    <table>
-      <thead><tr><th>快捷键</th><th>功能</th></tr></thead>
-      <tbody>
-        <tr><td><code>Prefix + | / -</code></td><td>竖直 / 水平分割</td></tr>
-        <tr><td><code>Prefix + h/j/k/l</code></td><td>切换 pane</td></tr>
-        <tr><td><code>Alt+Shift + HJKL</code></td><td>调整 pane 大小</td></tr>
-        <tr><td><code>Prefix + v</code></td><td>进入复制模式（vi）</td></tr>
-        <tr><td><code>v / y / Esc</code></td><td>选择 / 复制 / 取消</td></tr>
-        <tr><td><code>Prefix + r</code></td><td>重载配置</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section section-target" id="tmux-plugins">
-    <h2>tmux · 插件</h2>
-    <p>通过 tpm 管理，Prefix+I 安装。</p>
-    <table>
-      <thead><tr><th>插件</th><th>用途</th></tr></thead>
-      <tbody>
-        <tr><td><code>tmux-resurrect</code></td><td>保存/恢复 session</td></tr>
-        <tr><td><code>tmux-continuum</code></td><td>自动保存 + 恢复</td></tr>
-        <tr><td><code>tmux-sensible</code></td><td>合理默认值</td></tr>
-        <tr><td><code>tmux-prefix-highlight</code></td><td>prefix 模式指示</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ═══════════════ SSH ═══════════════ -->
-
-  <section class="section section-target" id="ssh-overview">
-    <h2>SSH · 概览与加密</h2>
-    <p>SSH 密钥和客户端配置通过 git-crypt 加密存储。磁盘文件始终明文，git 对象存储中是 GPG 密文。</p>
-    <table>
-      <thead><tr><th>文件类型</th><th>状态</th></tr></thead>
-      <tbody>
-        <tr><td>私钥 + PEM</td><td>🔒 加密</td></tr>
-        <tr><td><code>config</code></td><td>🔒 加密</td></tr>
-        <tr><td><code>*.pub</code></td><td>📄 明文</td></tr>
-        <tr><td><code>known_hosts</code></td><td>📄 明文</td></tr>
-      </tbody>
-    </table>
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-block-label">~/.dotfiles/.gitattributes</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="syn-c"># encrypt SSH private keys and config</span>
-<span class="syn-v">ssh/.ssh/*</span> <span class="syn-v">filter</span>=<span class="syn-s">git-crypt</span> <span class="syn-v">diff</span>=<span class="syn-s">git-crypt</span>
-<span class="syn-v">ssh/.ssh/*.pub</span> <span class="syn-o">-filter</span> <span class="syn-o">-diff</span>
-<span class="syn-v">ssh/.ssh/known_hosts</span> <span class="syn-o">-filter</span> <span class="syn-o">-diff</span></pre>
-    </div>
-  </section>
-
-  <section class="section section-target" id="ssh-config">
-    <h2>SSH · Config 结构</h2>
-    <p>主机别名、密钥映射、跳板机路由。以下脱敏后示例：</p>
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-block-label">~/.dotfiles/ssh/.ssh/config (脱敏)</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="syn-c"># GitHub</span>
-<span class="syn-b">Host</span> <span class="syn-v">github.com</span>
-    <span class="syn-v">Hostname</span> <span class="syn-v">ssh.github.com</span>
-    <span class="syn-v">Port</span> <span class="syn-n">443</span>
-
-<span class="syn-c"># 跳板机</span>
-<span class="syn-b">Host</span> <span class="syn-v">dev</span>
-    <span class="syn-v">IdentityFile</span> <span class="syn-v">~/.ssh/dev</span>
-    <span class="syn-v">Port</span> <span class="syn-n">2222</span>
-
-<span class="syn-b">Host</span> <span class="syn-v">prod</span>
-    <span class="syn-v">IdentityFile</span> <span class="syn-v">~/.ssh/prod</span>
-    <span class="syn-v">Port</span> <span class="syn-n">22222</span>
-
-<span class="syn-c"># 内网 + 6 台其他机器 (从略)</span></pre>
-    </div>
-  </section>
-
-  <!-- ═══════════════ Git ═══════════════ -->
-
-  <section class="section section-target" id="git-config">
-    <h2>Git · 全局配置与签名</h2>
-    <p>全局 <code>~/.gitconfig</code> 配置 GPG 签名密钥，所有 commit 和 tag 自动签名。</p>
-    <table>
-      <thead><tr><th>设置</th><th>值</th></tr></thead>
-      <tbody>
-        <tr><td><code>user.signingkey</code></td><td><code>E6B06164FE40CC96</code></td></tr>
-        <tr><td><code>commit.gpgsign</code></td><td><code>true</code></td></tr>
-        <tr><td><code>tag.gpgsign</code></td><td><code>true</code></td></tr>
-        <tr><td><code>init.defaultBranch</code></td><td><code>main</code></td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ═══════════════ GnuPG ═══════════════ -->
-
-  <section class="section section-target" id="gnupg-config">
-    <h2>GnuPG · Pinentry 配置</h2>
-    <p>仅包含 pinentry 模式设置，不含私钥材料。</p>
-    <table>
-      <thead><tr><th>文件</th><th>内容</th></tr></thead>
-      <tbody>
-        <tr><td><code>gpg.conf</code></td><td><code>pinentry-mode loopback</code></td></tr>
-        <tr><td><code>gpg-agent.conf</code></td><td><code>allow-loopback-pinentry</code></td></tr>
-      </tbody>
-    </table>
-    <div class="callout">
-      <strong>不在 dotfiles 中：</strong><code>private-keys-v1.d/</code>（私钥材料）。私钥仅通过离线备份 <code>gpg-backup.asc</code> 传递。
-    </div>
-  </section>
-
-  <!-- ═══════════════ Neovim ═══════════════ -->
-
-  <section class="section section-target" id="nvim-config">
-    <h2>Neovim · 配置与插件</h2>
-    <p>基于 Neovim 0.12+ 内置 <code>vim.pack.add()</code> API，零第三方插件管理器。30+ 插件，gruvbox 主题、blink.cmp 补全、conform 格式化。</p>
-
-    <div class="code-block">
-      <div class="code-block-header"><span class="code-block-label">~/.dotfiles/nvim/.config/nvim/init.lua</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
-      <pre><span class="syn-c">-- Neovim Configuration - vim.pack API (Neovim 0.12+)</span>
-
-<span class="syn-f">require</span>(<span class="syn-s">"config.options"</span>)
-<span class="syn-f">require</span>(<span class="syn-s">"plugins"</span>)
-<span class="syn-f">require</span>(<span class="syn-s">"config.lsp"</span>)
-<span class="syn-f">require</span>(<span class="syn-s">"config.keymaps"</span>)
-<span class="syn-f">require</span>(<span class="syn-s">"config.commands"</span>)</pre>
-    </div>
-
-    <h3>插件</h3>
-    <table>
-      <thead><tr><th>类别</th><th>插件</th></tr></thead>
-      <tbody>
-        <tr><td>主题</td><td>gruvbox.nvim</td></tr>
-        <tr><td>UI</td><td>lualine、bufferline、neo-tree、which-key、indent-blankline</td></tr>
-        <tr><td>补全</td><td>blink.cmp（LSP + path + snippets + buffer）</td></tr>
-        <tr><td>语法</td><td>treesitter + textobjects（21 语言）</td></tr>
-        <tr><td>搜索</td><td>telescope</td></tr>
-        <tr><td>导航</td><td>flash.nvim、refjump、mini.ai / mini.surround</td></tr>
-        <tr><td>编辑</td><td>yanky（OSC52）、Comment.nvim</td></tr>
-        <tr><td>格式化</td><td>conform.nvim（10 语言，保存时自动）</td></tr>
-        <tr><td>Lint</td><td>nvim-lint（BufWritePost 触发）</td></tr>
-        <tr><td>诊断</td><td>tiny-inline-diagnostic、tiny-code-action</td></tr>
-        <tr><td>语言</td><td>rustaceanvim + crates.nvim（Rust）、typst-preview</td></tr>
-        <tr><td>浏览器</td><td>firenvim（手动触发）</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-</main>
-
-<script>
-function copyCode(btn) {
-  const pre = btn.closest('.code-block').querySelector('pre');
-  navigator.clipboard.writeText(pre.textContent).then(() => {
-    btn.textContent = 'Copied'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
-  });
-}
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.classList.toggle('active', item.getAttribute('href') === '#' + entry.target.id);
-      });
-    }
-  });
-}, { rootMargin: '-10% 0px -80% 0px' });
-document.querySelectorAll('.section-target').forEach(s => observer.observe(s));
-</script>
 </body>
 </html>
