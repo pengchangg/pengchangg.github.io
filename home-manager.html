@@ -6,17 +6,17 @@
 <title>home-manager-config — Nix Home Manager 配置</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #30363d;
-    --text: #c9d1d9;
-    --dim: #8b949e;
-    --accent: #58a6ff;
-    --green: #3fb950;
-    --yellow: #d2991d;
-    --red: #f85149;
-    --purple: #bc8cff;
-    --cyan: #39d3b5;
+    --bg: #ffffff;
+    --surface: #f6f8fa;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --dim: #656d76;
+    --accent: #0969da;
+    --green: #1a7f37;
+    --yellow: #9a6700;
+    --red: #cf222e;
+    --purple: #8250df;
+    --cyan: #1b7c83;
     --mono: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace;
   }
 
@@ -25,7 +25,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--mono);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
     line-height: 1.6;
     max-width: 960px;
     margin: 0 auto;
@@ -44,11 +44,11 @@
     margin-bottom: 2rem;
     background: var(--surface);
   }
-  .hero .prompt { color: var(--green); }
+  .hero .prompt { color: var(--green); font-family: var(--mono); }
   .hero .prompt::before { content: "❯ "; }
-  .hero h1 { font-size: 1.5rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: var(--accent); }
+  .hero h1 { font-size: 1.5rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: var(--text); }
   .hero .desc { color: var(--dim); font-size: 0.95rem; margin-bottom: 1rem; }
-  .hero .badge { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .hero .badge { display: inline-flex; align-items: center; gap: 0.6rem; }
 
   /* ── Sections ─────────────────────────────── */
   section {
@@ -60,17 +60,18 @@
   }
   h2 {
     font-size: 1.1rem;
-    color: var(--accent);
+    color: var(--text);
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-family: var(--mono);
   }
   h2::before { content: "##"; color: var(--dim); font-weight: 400; }
 
   /* ── File tree ────────────────────────────── */
   .tree { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; }
-  .tree pre { color: var(--text); font-size: 0.85rem; line-height: 1.8; }
+  .tree pre { color: var(--text); font-family: var(--mono); font-size: 0.85rem; line-height: 1.8; }
   .tree .d { color: var(--accent); }   /* directory */
   .tree .c { color: var(--dim); }       /* comment */
   .tree .f { color: var(--yellow); }    /* file */
@@ -83,9 +84,9 @@
     border-radius: 6px;
     padding: 1rem;
   }
-  .module h3 { font-size: 0.9rem; color: var(--purple); margin-bottom: 0.4rem; }
-  .module .path { font-size: 0.75rem; color: var(--dim); margin-bottom: 0.5rem; }
-  .module ul { list-style: none; font-size: 0.8rem; }
+  .module h3 { font-size: 0.9rem; color: var(--purple); margin-bottom: 0.4rem; font-family: var(--mono); }
+  .module .path { font-size: 0.75rem; color: var(--dim); margin-bottom: 0.5rem; font-family: var(--mono); }
+  .module ul { list-style: none; font-size: 0.82rem; }
   .module li { color: var(--text); }
   .module li::before { content: "- "; color: var(--dim); }
 
@@ -95,14 +96,14 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 1rem;
+    font-family: var(--mono);
     font-size: 0.82rem;
     overflow-x: auto;
     line-height: 1.6;
   }
-  .code .kw { color: var(--red); }      /* keyword */
-  .code .str { color: var(--green); }   /* string */
   .code .cmt { color: var(--dim); }     /* comment */
   .code .cmd { color: var(--accent); }  /* command */
+  .code .str { color: var(--green); }   /* string */
 
   /* ── Steps ────────────────────────────────── */
   .steps { counter-reset: step; list-style: none; }
@@ -110,10 +111,11 @@
   .steps li::before {
     content: counter(step);
     position: absolute; left: 0;
-    background: var(--accent); color: var(--bg);
+    background: var(--accent); color: #fff;
     width: 1.3rem; height: 1.3rem;
     border-radius: 50%;
     text-align: center;
+    font-family: var(--mono);
     font-size: 0.75rem;
     font-weight: 700;
     line-height: 1.3rem;
@@ -121,21 +123,29 @@
 
   /* ── Note / warning ───────────────────────── */
   .note {
-    background: var(--bg);
+    background: #ddf4ff;
     border-left: 3px solid var(--accent);
     padding: 0.8rem 1rem;
     margin: 1rem 0;
     font-size: 0.85rem;
     color: var(--text);
+    border-radius: 0 6px 6px 0;
   }
   .warn {
-    background: rgba(210, 153, 29, 0.1);
+    background: #fff8c5;
     border-left: 3px solid var(--yellow);
     padding: 0.8rem 1rem;
     margin: 1rem 0;
     font-size: 0.85rem;
-    color: var(--yellow);
+    color: var(--text);
+    border-radius: 0 6px 6px 0;
   }
+
+  /* ── Tables ───────────────────────────────── */
+  table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
+  thead tr { border-bottom: 2px solid var(--border); }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; }
 
   /* ── Footer ───────────────────────────────── */
   footer {
@@ -340,47 +350,47 @@
 
   <h3 style="color:var(--yellow);font-size:0.85rem;margin-bottom:0.5rem;">新机恢复流程</h3>
   <ol class="steps">
-    <li>导入 GPG 密钥：<code style="color:var(--green)">gpg --import /path/to/gpg-backup.asc</code></li>
-    <li>克隆仓库：<code style="color:var(--green)">git clone git@github.com:pengchangg/home-manager-config.git ~/.config/home-manager</code></li>
-    <li>解密 SSH 文件：<code style="color:var(--green)">cd ~/.config/home-manager && git-crypt unlock</code></li>
-    <li>应用配置：<code style="color:var(--green)">home-manager switch</code></li>
+    <li>导入 GPG 密钥：<code style="font-family:var(--mono);color:var(--green);">gpg --import /path/to/gpg-backup.asc</code></li>
+    <li>克隆仓库：<code style="font-family:var(--mono);color:var(--green);">git clone git@github.com:pengchangg/home-manager-config.git ~/.config/home-manager</code></li>
+    <li>解密 SSH 文件：<code style="font-family:var(--mono);color:var(--green);">cd ~/.config/home-manager && git-crypt unlock</code></li>
+    <li>应用配置：<code style="font-family:var(--mono);color:var(--green);">home-manager switch</code></li>
   </ol>
 
   <div class="warn">
-    <strong>⚠ 注意</strong>：SSH 私钥通过 <code>home.activation</code> 以 <code>install -m 600</code> 直接复制，不经过 Nix store（Nix store 强制 0444 权限，SSH 会拒绝）。
+    <strong>⚠ 注意</strong>：SSH 私钥通过 <code style="font-family:var(--mono);">home.activation</code> 以 <code style="font-family:var(--mono);">install -m 600</code> 直接复制，不经过 Nix store（Nix store 强制 0444 权限，SSH 会拒绝）。
   </div>
 
   <div class="note">
-    <strong>GPG 密钥备份</strong>：<code>gpg --export-secret-keys --armor E6B06164FE40CC96 > ~/gpg-backup.asc</code> — 失去 GPG 密钥 = 无法解密 SSH 私钥
+    <strong>GPG 密钥备份</strong>：<code style="font-family:var(--mono);">gpg --export-secret-keys --armor E6B06164FE40CC96 > ~/gpg-backup.asc</code> — 失去 GPG 密钥 = 无法解密 SSH 私钥
   </div>
 </section>
 
 <!-- ── Adding a tool ────────────────────────── -->
 <section>
   <h2>新增工具</h2>
-  <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+  <table>
     <thead>
-      <tr style="text-align:left;border-bottom:1px solid var(--border);">
-        <th style="padding:0.5rem;color:var(--accent);">优先级</th>
-        <th style="padding:0.5rem;color:var(--accent);">方式</th>
-        <th style="padding:0.5rem;color:var(--accent);">示例</th>
+      <tr>
+        <th>优先级</th>
+        <th>方式</th>
+        <th>示例</th>
       </tr>
     </thead>
     <tbody>
-      <tr style="border-bottom:1px solid var(--border);">
-        <td style="padding:0.5rem;color:var(--green);">1</td>
-        <td style="padding:0.5rem;">内置 Home Manager 模块</td>
-        <td style="padding:0.5rem;color:var(--green);"><code>programs.&lt;name&gt;.enable = true</code></td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--border);">
-        <td style="padding:0.5rem;color:var(--yellow);">2</td>
-        <td style="padding:0.5rem;">dotfile 写入</td>
-        <td style="padding:0.5rem;color:var(--green);"><code>home.file.".&lt;config&gt;".text = "..."</code></td>
+      <tr>
+        <td style="color:var(--green);">1</td>
+        <td>内置 Home Manager 模块</td>
+        <td style="font-family:var(--mono);color:var(--green);"><code>programs.&lt;name&gt;.enable = true</code></td>
       </tr>
       <tr>
-        <td style="padding:0.5rem;color:var(--red);">3</td>
-        <td style="padding:0.5rem;">纯二进制包</td>
-        <td style="padding:0.5rem;color:var(--green);"><code>home.packages = [ pkgs.foo ]</code></td>
+        <td style="color:var(--yellow);">2</td>
+        <td>dotfile 写入</td>
+        <td style="font-family:var(--mono);color:var(--green);"><code>home.file.".&lt;config&gt;".text = "..."</code></td>
+      </tr>
+      <tr>
+        <td style="color:var(--red);">3</td>
+        <td>纯二进制包</td>
+        <td style="font-family:var(--mono);color:var(--green);"><code>home.packages = [ pkgs.foo ]</code></td>
       </tr>
     </tbody>
   </table>
