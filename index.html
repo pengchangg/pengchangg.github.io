@@ -2,400 +2,408 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>Home Manager 配置一览</title>
-<meta name="author" content="pengchang">
-<meta name="description" content="声明式管理 Arch Linux 开发环境：33 个包、8 个程序模块，bash/zsh 双 Shell，Nix + home-manager 全环境配置。">
-<meta name="keywords" content="Nix, home-manager, Arch Linux, dotfiles, 配置管理, bash, zsh">
-<meta name="generator" content="Kami">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>home-manager-config — Nix Home Manager 配置</title>
 <style>
-  @font-face {
-    font-family: "TsangerJinKai02";
-    src: url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "TsangerJinKai02";
-    src: url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
-    font-weight: 500;
-    font-style: normal;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --parchment: #f5f4ed;
-    --ivory:     #faf9f5;
-    --sand:      #e8e6dc;
-    --near-black:#141413;
-    --dark-warm: #3d3d3a;
-    --olive:     #504e49;
-    --stone:     #6b6a64;
-    --brand:     #1B365D;
-    --border:    #e8e6dc;
-    --border-soft:#e5e3d8;
-    --tag-bg:    #E4ECF5;
-    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
-    --sans: var(--serif);
+    --bg: #ffffff;
+    --surface: #f6f8fa;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --dim: #656d76;
+    --accent: #0969da;
+    --green: #1a7f37;
+    --yellow: #9a6700;
+    --red: #cf222e;
+    --purple: #8250df;
+    --cyan: #1b7c83;
+    --mono: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace;
   }
 
-  html, body { background: var(--parchment); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 48px 56px;
-    color: var(--near-black);
-    font-family: var(--serif);
-    font-size: 13px;
-    line-height: 1.55;
-    letter-spacing: 0.3pt;
-  }
-
-  @media (max-width: 800px) {
-    body { padding: 32px 28px; }
-  }
-
-  .header {
-    border-left: 2.5pt solid var(--brand);
-    border-radius: 1.5pt;
-    padding-left: 8pt;
-    margin-bottom: 18pt;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20pt;
-  }
-  .title-block { flex: 1; }
-  .eyebrow {
-    font-size: 12px;
-    color: var(--brand);
-    letter-spacing: 1.5pt;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    font-weight: 500;
-  }
-  h1 {
-    font-family: var(--serif);
-    font-size: 32px;
-    font-weight: 500;
-    color: var(--near-black);
-    line-height: 1.15;
-    margin-bottom: 6px;
-  }
-  .subtitle {
-    font-size: 15px;
-    color: var(--olive);
-    line-height: 1.45;
-  }
-  .meta {
-    font-size: 12px;
-    color: var(--stone);
-    text-align: right;
-    line-height: 1.55;
-    white-space: nowrap;
-  }
-
-  .metrics {
-    display: flex;
-    gap: 18pt;
-    margin-bottom: 22pt;
-    padding: 6pt 0 8pt 0;
-    border-bottom: 0.3pt dotted var(--border);
-  }
-  .metric {
-    flex: 1;
-    background: transparent;
-    padding: 0;
-    display: flex;
-    align-items: baseline;
-    gap: 6pt;
-    break-inside: avoid;
-  }
-  .metric-value {
-    font-family: var(--serif);
-    font-size: 26px;
-    font-weight: 500;
-    color: var(--brand);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  .metric-label {
-    font-size: 12px;
-    color: var(--olive);
-    line-height: 1.4;
-  }
-
-  section { margin-bottom: 22pt; break-inside: avoid; }
-  section:last-of-type { margin-bottom: 0; }
-
-  h2 {
-    font-family: var(--serif);
-    font-size: 20px;
-    font-weight: 500;
-    color: var(--near-black);
-    margin-bottom: 8pt;
-  }
-  h2 .sub {
-    font-size: 12px;
-    color: var(--stone);
-    font-weight: 400;
-    margin-left: 6pt;
-  }
-
-  p { margin-bottom: 7pt; line-height: 1.55; }
-  p:last-child { margin-bottom: 0; }
-
-  .lead {
-    font-size: 16px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
     line-height: 1.6;
-    color: var(--dark-warm);
-    margin-bottom: 18pt;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    min-height: 100vh;
   }
 
-  .hl { color: var(--brand); font-weight: 500; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
 
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24pt;
+  /* ── Hero ─────────────────────────────────── */
+  .hero {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    background: var(--surface);
   }
+  .hero .prompt { color: var(--green); font-family: var(--mono); }
+  .hero .prompt::before { content: "❯ "; }
+  .hero h1 { font-size: 1.5rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: var(--text); }
+  .hero .desc { color: var(--dim); font-size: 0.95rem; margin-bottom: 1rem; }
+  .hero .badge { display: inline-flex; align-items: center; gap: 0.6rem; }
 
-  ul.dash {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  /* ── Sections ─────────────────────────────── */
+  section {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
   }
-  ul.dash li {
-    position: relative;
-    padding-left: 14pt;
-    margin-bottom: 5pt;
-    line-height: 1.5;
-  }
-  ul.dash li::before {
-    content: "\2013";
-    position: absolute;
-    left: 0;
-    color: var(--brand);
-  }
-
-  .timeline {
+  h2 {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 1rem;
     display: flex;
-    gap: 16pt;
-    margin-top: 8pt;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
   }
-  .tl-step {
-    flex: 1;
-    break-inside: avoid;
+  h2::before { content: "##"; color: var(--dim); font-weight: 400; }
+
+  /* ── File tree ────────────────────────────── */
+  .tree { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; }
+  .tree pre { color: var(--text); font-family: var(--mono); font-size: 0.85rem; line-height: 1.8; }
+  .tree .d { color: var(--accent); }   /* directory */
+  .tree .c { color: var(--dim); }       /* comment */
+  .tree .f { color: var(--yellow); }    /* file */
+
+  /* ── Modules grid ─────────────────────────── */
+  .modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  .module {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
   }
-  .tl-year {
-    font-family: var(--serif);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--brand);
-    margin-bottom: 3pt;
+  .module h3 { font-size: 0.9rem; color: var(--purple); margin-bottom: 0.4rem; font-family: var(--mono); }
+  .module .path { font-size: 0.75rem; color: var(--dim); margin-bottom: 0.5rem; font-family: var(--mono); }
+  .module ul { list-style: none; font-size: 0.82rem; }
+  .module li { color: var(--text); }
+  .module li::before { content: "- "; color: var(--dim); }
+
+  /* ── Code blocks ──────────────────────────── */
+  pre.code {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    overflow-x: auto;
+    line-height: 1.6;
   }
-  .tl-head {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--near-black);
-    margin-bottom: 3pt;
-  }
-  .tl-body {
-    font-size: 12px;
-    color: var(--olive);
-    line-height: 1.45;
+  .code .cmt { color: var(--dim); }     /* comment */
+  .code .cmd { color: var(--accent); }  /* command */
+  .code .str { color: var(--green); }   /* string */
+
+  /* ── Steps ────────────────────────────────── */
+  .steps { counter-reset: step; list-style: none; }
+  .steps li { counter-increment: step; margin-bottom: 0.8rem; padding-left: 2rem; position: relative; font-size: 0.88rem; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute; left: 0;
+    background: var(--accent); color: #fff;
+    width: 1.3rem; height: 1.3rem;
+    border-radius: 50%;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.3rem;
   }
 
-  table, .kami-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    margin: 10pt 0;
-    break-inside: avoid;
+  /* ── Note / warning ───────────────────────── */
+  .note {
+    background: #ddf4ff;
+    border-left: 3px solid var(--accent);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    color: var(--text);
+    border-radius: 0 6px 6px 0;
   }
-  table th, .kami-table th {
-    text-align: left;
-    font-weight: 500;
-    color: var(--dark-warm);
-    padding: 6pt 8pt;
-    border-bottom: 1pt solid var(--border);
-    background: transparent;
-  }
-  table td, .kami-table td {
-    padding: 5pt 8pt;
-    border-bottom: 0.3pt solid var(--border-soft);
-    vertical-align: top;
-  }
-  table.striped tbody tr:nth-child(even) td {
-    background: var(--ivory);
+  .warn {
+    background: #fff8c5;
+    border-left: 3px solid var(--yellow);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    color: var(--text);
+    border-radius: 0 6px 6px 0;
   }
 
-  .callout {
-    background: transparent;
-    border-left: 1.8pt solid var(--brand);
-    padding: 5pt 0 5pt 14pt;
-    margin: 14pt 0;
-    font-size: 13px;
-    line-height: 1.55;
-    color: var(--olive);
-    break-inside: avoid;
-  }
+  /* ── Tables ───────────────────────────────── */
+  table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
+  thead tr { border-bottom: 2px solid var(--border); }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; }
 
-  code {
-    font-family: "JetBrains Mono", "SF Mono", "Fira Code", Consolas, Monaco, monospace;
-    font-size: 12px;
-    background: var(--ivory);
-    padding: 1pt 4pt;
-    border-radius: 3pt;
-    color: var(--dark-warm);
+  /* ── Footer ───────────────────────────────── */
+  footer {
+    text-align: center;
+    color: var(--dim);
+    font-size: 0.8rem;
+    padding: 2rem 0 1rem;
   }
+  footer a { color: var(--dim); }
 
-  .footer {
-    margin-top: 22pt;
-    padding-top: 8pt;
-    border-top: 0.3pt dotted var(--border);
-    font-size: 11px;
-    color: var(--stone);
-    display: flex;
-    justify-content: space-between;
-    letter-spacing: 0.3pt;
+  /* ── Responsive ───────────────────────────── */
+  @media (max-width: 640px) {
+    body { padding: 1rem; }
+    .modules { grid-template-columns: 1fr; }
+    .hero { padding: 1.2rem; }
   }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="title-block">
-    <div class="eyebrow">Nix · 配置管理</div>
-    <h1>Home Manager 配置一览</h1>
-    <div class="subtitle">声明式管理 Arch Linux 开发环境——33 个包，8 个程序模块，bash / zsh 双 Shell，一次 <code>home-manager switch</code> 即达声明状态。</div>
-  </div>
-  <div class="meta">
-    pengchang<br>
-    2026.06.16<br>
-    v1
-  </div>
+<!-- ── Hero ─────────────────────────────────── -->
+<div class="hero">
+  <span class="prompt">~/.config/home-manager</span>
+  <h1>home-manager-config</h1>
+  <p class="desc">Nix Home Manager 配置仓库 — 声明式管理 shell、编辑器、Git、Tmux、GPG、SSH 等开发环境</p>
+  <span class="badge">
+    <a href="https://github.com/pengchangg/home-manager-config/actions/workflows/ci.yml">
+      <img src="https://github.com/pengchangg/home-manager-config/actions/workflows/ci.yml/badge.svg" alt="CI">
+    </a>
+    <span style="font-size:0.8rem;color:var(--dim)">nixpkgs-unstable · stateVersion 26.05</span>
+  </span>
 </div>
 
-<div class="metrics">
-  <div class="metric">
-    <div class="metric-value">33</div>
-    <div class="metric-label">Nix 包</div>
-  </div>
-  <div class="metric">
-    <div class="metric-value">8</div>
-    <div class="metric-label">程序模块</div>
-  </div>
-  <div class="metric">
-    <div class="metric-value">bash+zsh</div>
-    <div class="metric-label">双 Shell</div>
-  </div>
-  <div class="metric">
-    <div class="metric-value">GPG</div>
-    <div class="metric-label">签名提交</div>
-  </div>
-</div>
-
-<p class="lead">
-  从 <span class="hl">stow + git</span> 手工符号链接，迁移到 <span class="hl">Nix + home-manager</span> 声明式全环境管理。覆盖 Shell、编辑器、Git、Tmux、文件管理器等全部日常工具，CI 自动构建验证，变更可回滚。
-</p>
-
-<div class="two-col">
-  <section>
-    <h2>包管理</h2>
-    <p>33 个包通过 <code>home.packages</code> 声明，来自 <span class="hl">nixpkgs-unstable</span> channel。</p>
-    <ul class="dash">
-      <li>Shell 工具：<span class="hl">bat, fd, fzf, ripgrep, lf, tmux, zsh</span> 等 11 个</li>
-      <li>编辑器：<span class="hl">neovim, nano</span></li>
-      <li>版本控制：<span class="hl">git, git-crypt, stow</span></li>
-      <li>构建工具：<span class="hl">gcc, gnumake, tree-sitter</span></li>
-      <li>网络实用：<span class="hl">podman, curl, ffmpeg, openssh</span> 等 8 个</li>
-      <li>Python：<span class="hl">python3, weasyprint</span>（Kami 排版）</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>程序模块</h2>
-    <p>8 个 home-manager 原生模块，配置声明即生效。</p>
-    <ul class="dash">
-      <li><span class="hl">starship</span>：极简 prompt，目录 + git 分支</li>
-      <li><span class="hl">bash / zsh</span>：initExtra 外置脚本，fzf 快捷键</li>
-      <li><span class="hl">git</span>：GPG 签名 + gh 凭证助手</li>
-      <li><span class="hl">tmux</span>：vi 模式、256 色、鼠标支持</li>
-      <li><span class="hl">fzf</span>：Ctrl+R 历史 / Ctrl+T 文件 / Alt+C 目录</li>
-      <li><span class="hl">lf</span>：三栏布局 + pv.sh 预览脚本</li>
-    </ul>
-  </section>
-</div>
-
+<!-- ── File tree ────────────────────────────── -->
 <section>
-  <h2>配置模块一览</h2>
-  <table class="kami-table striped">
+  <h2>架构</h2>
+  <div class="tree">
+<pre>
+<span class="cmt">──</span> <span class="d">home.nix</span>              <span class="c"># 入口 — imports + 用户/Home 自动检测</span>
+<span class="cmt">├──</span> <span class="d">modules/</span>               <span class="c"># 模块化配置 (8 个模块)</span>
+<span class="cmt">│   ├──</span> <span class="f">packages.nix</span>       <span class="c"># 系统包 (shell, dev, crypto, utils)</span>
+<span class="cmt">│   ├──</span> <span class="f">shell.nix</span>          <span class="c"># Bash / Zsh / Starship / fzf</span>
+<span class="cmt">│   ├──</span> <span class="f">git.nix</span>            <span class="c"># Git 用户签名 + GPG 签名 + GitHub 凭据</span>
+<span class="cmt">│   ├──</span> <span class="f">tmux.nix</span>           <span class="c"># Tmux 配置 (vi 模式, 分屏, 状态栏)</span>
+<span class="cmt">│   ├──</span> <span class="f">lf.nix</span>             <span class="c"># lf 文件管理器 + vim 键位</span>
+<span class="cmt">│   ├──</span> <span class="f">editors.nix</span>        <span class="c"># Neovim (完整配置, 递归链接)</span>
+<span class="cmt">│   ├──</span> <span class="f">gnupg.nix</span>          <span class="c"># GPG 配置 (keyboxd, loopback pinentry)</span>
+<span class="cmt">│   └──</span> <span class="f">ssh.nix</span>            <span class="c"># SSH config + git-crypt 加密私钥</span>
+<span class="cmt">├──</span> <span class="f">initExtra.bash</span>        <span class="c"># Bash 别名 + fzf 快捷键</span>
+<span class="cmt">├──</span> <span class="f">initExtra.zsh</span>         <span class="c"># Zsh 别名 + fzf 快捷键</span>
+<span class="cmt">├──</span> <span class="f">pv.sh</span>                 <span class="c"># lf 文件预览脚本</span>
+<span class="cmt">├──</span> <span class="d">nvim/</span>                  <span class="c"># Neovim 完整配置</span>
+<span class="cmt">├──</span> <span class="d">ssh/</span>                   <span class="c"># SSH 私钥 (git-crypt 加密)</span>
+<span class="cmt">├──</span> <span class="f">.gitattributes</span>         <span class="c"># git-crypt 过滤器规则</span>
+<span class="cmt">└──</span> <span class="d">.github/workflows/</span>    <span class="c"># CI (语法检查 + 格式化检查)</span>
+</pre>
+  </div>
+</section>
+
+<!-- ── Modules ──────────────────────────────── -->
+<section>
+  <h2>模块</h2>
+  <div class="modules">
+
+    <div class="module">
+      <h3>packages</h3>
+      <span class="path">modules/packages.nix</span>
+      <ul>
+        <li>Shell: zsh, tmux, bat, fd, fzf, ripgrep</li>
+        <li>Editor: neovim, nano</li>
+        <li>Dev: gcc, gnumake, tree-sitter</li>
+        <li>Git: gh, git, git-crypt, stow</li>
+        <li>Utils: btop, podman, curl, ffmpeg, wget</li>
+        <li>Nix: nixpkgs-fmt</li>
+        <li>Python: python3 + pip + weasyprint</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>shell</h3>
+      <span class="path">modules/shell.nix</span>
+      <ul>
+        <li>Session variables: EDITOR=nvim, PAGER=less</li>
+        <li>Starship prompt (git info, compact)</li>
+        <li>Bash: history 5000, histappend, ignoredups</li>
+        <li>Zsh: 加载 initExtra.zsh</li>
+        <li>fzf: CTRL-T 文件预览, ALT-C cd</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>git</h3>
+      <span class="path">modules/git.nix</span>
+      <ul>
+        <li>用户: pengchang / changpeng94@gmail.com</li>
+        <li>GPG 签名: 默认开启, key E6B06164FE40CC96</li>
+        <li>默认分支: main</li>
+        <li>GitHub 凭据: gh auth git-credential</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>tmux</h3>
+      <span class="path">modules/tmux.nix</span>
+      <ul>
+        <li>Vi 模式 + mouse</li>
+        <li>Base index 1, history 10000</li>
+        <li>分屏: | 水平 / - 垂直</li>
+        <li>面板导航: hjkl (vim-style)</li>
+        <li>面板调整: M-HJKL</li>
+        <li>黑色状态栏, 青色日期</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>lf</h3>
+      <span class="path">modules/lf.nix</span>
+      <ul>
+        <li>文件管理器 + vim 键位</li>
+        <li>预览脚本 pv.sh (bat/cat/tree)</li>
+        <li>显示隐藏文件, 智能大小写</li>
+        <li>Ctrl-N 创建目录, Ctrl-F 创建文件</li>
+        <li>y/d/p: 复制/剪切/粘贴</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>editors</h3>
+      <span class="path">modules/editors.nix</span>
+      <ul>
+        <li>Neovim: 完整配置通过递归 home.file 链接</li>
+        <li>配置目录: nvim/.config/nvim/</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>gnupg</h3>
+      <span class="path">modules/gnupg.nix</span>
+      <ul>
+        <li>keyboxd 存储后端</li>
+        <li>loopback pinentry (兼容 Git 签名)</li>
+        <li>通过 home.file 直接写入 ~/.gnupg/</li>
+      </ul>
+    </div>
+
+    <div class="module">
+      <h3>ssh</h3>
+      <span class="path">modules/ssh.nix</span>
+      <ul>
+        <li>SSH config: ~/.ssh/config (明文)</li>
+        <li>私钥: 通过 home.activation 安装 (600 权限)</li>
+        <li>git-crypt 加密: 磁盘明文, git 密文</li>
+        <li>10 个 SSH 密钥 (dev, prod, aws, vm...)</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Quick start ──────────────────────────── -->
+<section>
+  <h2>快速开始</h2>
+  <pre class="code">
+<span class="cmt"># 应用配置 (修改后执行)</span>
+<span class="cmd">home-manager switch</span>
+
+<span class="cmt"># 仅构建 (语法检查 / 预演)</span>
+<span class="cmd">home-manager build</span>
+
+<span class="cmt"># 构建到隔离 profile (测试用)</span>
+<span class="cmd">home-manager build -b test</span>
+
+<span class="cmt"># CI 式构建</span>
+<span class="cmd">nix-shell -p home-manager --run</span> <span class="str">'home-manager build -f ./home.nix'</span>
+
+<span class="cmt"># 格式化检查</span>
+<span class="cmd">nixpkgs-fmt --check *.nix modules/*.nix</span>
+
+<span class="cmt"># 自动格式化</span>
+<span class="cmd">nixpkgs-fmt *.nix modules/*.nix</span>
+
+<span class="cmt"># 临时试用新包</span>
+<span class="cmd">nix-shell -p &lt;pkg&gt;</span>
+</pre>
+</section>
+
+<!-- ── SSH / git-crypt ──────────────────────── -->
+<section>
+  <h2>SSH 私钥管理</h2>
+  <p style="font-size:0.88rem;color:var(--text);margin-bottom:1rem;">
+    所有 SSH 私钥通过 <strong style="color:var(--accent)">git-crypt</strong> 加密存储。磁盘文件始终为明文，Git 历史中为密文。
+  </p>
+
+  <h3 style="color:var(--yellow);font-size:0.85rem;margin-bottom:0.5rem;">加密原理</h3>
+  <div class="tree" style="margin-bottom:1rem;">
+<pre>
+<span class="c">磁盘 (明文)</span>  →  ssh/id_ed25519: <span class="str">OpenSSH private key</span> (SSH 可直接读取)
+<span class="c">Git  (密文)</span>  →  git show HEAD:ssh/id_ed25519: <span class="str">binary data</span> (加密 blob)
+<span class="c">过滤器</span>       →  .gitattributes: <span class="f">ssh/* filter=git-crypt diff=git-crypt</span>
+</pre>
+  </div>
+
+  <h3 style="color:var(--yellow);font-size:0.85rem;margin-bottom:0.5rem;">新机恢复流程</h3>
+  <ol class="steps">
+    <li>导入 GPG 密钥：<code style="font-family:var(--mono);color:var(--green);">gpg --import /path/to/gpg-backup.asc</code></li>
+    <li>克隆仓库：<code style="font-family:var(--mono);color:var(--green);">git clone git@github.com:pengchangg/home-manager-config.git ~/.config/home-manager</code></li>
+    <li>解密 SSH 文件：<code style="font-family:var(--mono);color:var(--green);">cd ~/.config/home-manager && git-crypt unlock</code></li>
+    <li>应用配置：<code style="font-family:var(--mono);color:var(--green);">home-manager switch</code></li>
+  </ol>
+
+  <div class="warn">
+    <strong>⚠ 注意</strong>：SSH 私钥通过 <code style="font-family:var(--mono);">home.activation</code> 以 <code style="font-family:var(--mono);">install -m 600</code> 直接复制，不经过 Nix store（Nix store 强制 0444 权限，SSH 会拒绝）。
+  </div>
+
+  <div class="note">
+    <strong>GPG 密钥备份</strong>：<code style="font-family:var(--mono);">gpg --export-secret-keys --armor E6B06164FE40CC96 > ~/gpg-backup.asc</code> — 失去 GPG 密钥 = 无法解密 SSH 私钥
+  </div>
+</section>
+
+<!-- ── Adding a tool ────────────────────────── -->
+<section>
+  <h2>新增工具</h2>
+  <table>
     <thead>
-      <tr><th>模块</th><th>方式</th><th>说明</th></tr>
+      <tr>
+        <th>优先级</th>
+        <th>方式</th>
+        <th>示例</th>
+      </tr>
     </thead>
     <tbody>
-      <tr><td>bash</td><td>programs.bash</td><td>initExtra.bash 外置；history 5000 条</td></tr>
-      <tr><td>zsh</td><td>programs.zsh</td><td>initExtra.zsh 外置；SHARE_HISTORY</td></tr>
-      <tr><td>git</td><td>programs.git</td><td>GPG 签名 + gh 凭证；默认分支 main</td></tr>
-      <tr><td>tmux</td><td>programs.tmux</td><td>vi 键位、256 色、base-index 1</td></tr>
-      <tr><td>starship</td><td>programs.starship</td><td>目录 + git 分支 + 状态 + ❯ 提示符</td></tr>
-      <tr><td>fzf</td><td>programs.fzf</td><td>40% 高度、reverse 布局、文件预览</td></tr>
-      <tr><td>lf</td><td>programs.lf</td><td>三栏 1:2:3、vim 键位、pv.sh 预览</td></tr>
-      <tr><td>gnupg</td><td>home.file</td><td>loopback pinentry，配合 GPG 签名</td></tr>
-      <tr><td>neovim</td><td>home.file</td><td>递归复制整个 nvim 配置目录</td></tr>
+      <tr>
+        <td style="color:var(--green);">1</td>
+        <td>内置 Home Manager 模块</td>
+        <td style="font-family:var(--mono);color:var(--green);"><code>programs.&lt;name&gt;.enable = true</code></td>
+      </tr>
+      <tr>
+        <td style="color:var(--yellow);">2</td>
+        <td>dotfile 写入</td>
+        <td style="font-family:var(--mono);color:var(--green);"><code>home.file.".&lt;config&gt;".text = "..."</code></td>
+      </tr>
+      <tr>
+        <td style="color:var(--red);">3</td>
+        <td>纯二进制包</td>
+        <td style="font-family:var(--mono);color:var(--green);"><code>home.packages = [ pkgs.foo ]</code></td>
+      </tr>
     </tbody>
   </table>
 </section>
 
-<section>
-  <h2>迁移路径</h2>
-  <div class="timeline">
-    <div class="tl-step">
-      <div class="tl-year">阶段 1</div>
-      <div class="tl-head">stow 管理</div>
-      <div class="tl-body">GNU stow + git 手工维护符号链接，git-crypt 加密敏感文件</div>
-    </div>
-    <div class="tl-step">
-      <div class="tl-year">阶段 2</div>
-      <div class="tl-head">引入 Nix</div>
-      <div class="tl-body">Nix 包管理器接管系统包安装，统一版本管理</div>
-    </div>
-    <div class="tl-step">
-      <div class="tl-year">阶段 3</div>
-      <div class="tl-head">home-manager</div>
-      <div class="tl-body">声明式全环境：包 + 配置 + 服务，一次 switch 到位，CI 自动验证</div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>日常命令</h2>
-  <table class="kami-table striped">
-    <thead>
-      <tr><th>命令</th><th>用途</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><code>home-manager switch</code></td><td>应用配置变更</td></tr>
-      <tr><td><code>home-manager build</code></td><td>仅构建，测试语法</td></tr>
-      <tr><td><code>home-manager generations</code></td><td>查看历史版本</td></tr>
-      <tr><td><code>nix-shell -p &lt;pkg&gt;</code></td><td>临时试用包，无需安装</td></tr>
-      <tr><td><code>nix-collect-garbage -d</code></td><td>清理旧版本，回收空间</td></tr>
-      <tr><td><code>home-manager expire-generations 7d</code></td><td>只保留最近 7 天的版本</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<div class="callout">
-  <strong>注意事项</strong>：<code>shellOptions</code> 只接受 <code>shopt</code> 参数，<code>set -o</code> 项（如 noclobber）放 <code>initExtra</code>；Nix 字符串不支持 <code>${}</code>，含 bash 变量的内容用 <code>builtins.readFile</code> 外置文件；Channel 锁定 <span class="hl">nixpkgs-unstable + home-manager master</span>；CI 通过 GitHub Actions 自动 <code>home-manager build</code> + <code>nixpkgs-fmt</code> 检查。
-</div>
-
-<div class="footer">
-  <span>公开 · pengchangg/home-manager-config</span>
-  <span>github.com/pengchangg/home-manager-config</span>
-</div>
+<!-- ── Footer ───────────────────────────────── -->
+<footer>
+  <a href="https://github.com/pengchangg/home-manager-config">github.com/pengchangg/home-manager-config</a>
+  &nbsp;·&nbsp;
+  Nix Home Manager · nixpkgs-unstable · stateVersion 26.05
+  <br>
+  <span style="font-size:0.7rem;">Generated for pengchangg.github.io</span>
+</footer>
 
 </body>
 </html>
